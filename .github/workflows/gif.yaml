@@ -1,0 +1,49 @@
+name: Deploy to GH pages and Generate demo.gif file
+
+on: 
+  push: 
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+  pages: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy_to_gh_pages_and_generate_gif:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: '.'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # Create a build folder
+      - name: Create a build folder
+        run: |
+          mkdir build
+
+      # Print the url of the github pages
+      - name: Print the url of the github pages
+        run: |
+          echo "The url of the github pages is ${{ steps.deployment.outputs.page_url }}"
+      
